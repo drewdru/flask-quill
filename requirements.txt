@@ -1,0 +1,27 @@
+# alembic
+# Babel
+Flask
+Flask-Admin
+# flask-admin-s3-upload
+# Flask-Assets
+# Flask-Babel
+# Flask-GeoIP
+# Flask-JWT-Extended
+# Flask-Login
+# Flask-Mail
+# Flask-Migrate
+# Flask-Principal
+# flask-restplus
+# Flask-Script
+# Flask-Security
+# Flask-Session
+# Flask-SQLAlchemy
+Flask-Bootstrap
+Flask-WTF
+Jinja2
+PyYAML
+# psycopg2
+# SQLAlchemy
+# sqlalchemy-mptt
+# SQLAlchemy-Utils
+# transliterate
