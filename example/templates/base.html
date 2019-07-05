@@ -1,0 +1,35 @@
+{% import 'static.html' as admin_static with context %}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}Example{% endblock %}</title>
+    {% block head_meta %}
+        <meta content='width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no' name='viewport'>
+        <meta name="author" content="">
+        <meta name="keywords" content="">
+        <meta name="description" content="">
+    {% endblock %}
+    {% block head_css %}
+        <link href='//fonts.googleapis.com/css?family=Lato' rel='stylesheet' type='text/css'>
+    {% endblock %}
+    {% block head %}
+    {% endblock %}
+    {% block head_tail %}
+    {% endblock %}
+    </head>
+    <body class="skin-black">
+        {% block page_body %}
+        {% endblock %}
+
+        {% block tail_js %}
+            <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/2.0.2/jquery.min.js"></script>
+            <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js"></script>
+            <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jqueryui/1/jquery-ui.min.js"></script>
+        {% endblock %}
+
+        {% block tail %}
+        {% endblock %}
+    </body>
+</html>

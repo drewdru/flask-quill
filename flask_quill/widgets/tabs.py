@@ -2,13 +2,14 @@ from wtforms import widgets
 
 class TabWidget(object):
     
-    def __init__(self, tabs=[]):
+    def __init__(self, tabs=[], wysiwyg_fields=['content'], tabs_field='language'):
         self.tabs = tabs
+        self.wysiwyg_fields = wysiwyg_fields
+        self.tabs_field = tabs_field
 
-    def __call__(self, fields, wysiwyg_field='content', **kwargs):
+    def __call__(self, fields, **kwargs):
         kwargs.setdefault('id', fields.id)
         
-        # kwargs.setdefault('class', 'tab')
         if kwargs.get('class'):
             kwargs['class'] += ' tabwidget'
         else:
@@ -18,29 +19,26 @@ class TabWidget(object):
         html = ['<div class="tab">']
         
         for tab in self.tabs:
-            html.append("""<button type="button" class="tablinks" onclick="openTab(event, '{}')">
+            html.append("""<button type='button' class='tablinks' onclick='openTab(event, "{}")'>
 {}</button>""".format(tab[0], tab[1]))
         html.append('</div>')
 
-        # field_list = ''
-        # for subfield in fields:
-        #     field_list += '{} {}'.format(subfield(), subfield.label)
         for index, tab in enumerate(self.tabs):
             subfield = fields[index]
-            content_id = "{}-{}".format(subfield.id, wysiwyg_field)
-            subfield.id = "{}-language__{}".format(subfield.id, tab[0])
-
-            html.append("""<div id="{}" class="tabcontent">
-{}</div><input type="hidden" id="hidden-{}" name="{}" value="{}">""".format(
+            hidden_inputs = []
+            for wysiwyg_field in self.wysiwyg_fields:
+                content_id = "{}-{}".format(subfield.id, wysiwyg_field)
+                hidden_inputs.append("""<input type='hidden' id='hidden-{}' name='{}' value='{}'>""".format(
+                    content_id, content_id, subfield.data[wysiwyg_field]
+                ))
+            subfield.id = "{}-{}__{}".format(subfield.id, self.tabs_field, tab[0])
+            html.append("""<div id='{}' class='tabcontent'>
+{}</div>{}""".format(
                 tab[0],
                 subfield(),
-                content_id,
-                content_id,
-                subfield.data[wysiwyg_field]))
+                ''.join(hidden_inputs)                
+                )
+            )
 
         html.append('</div>')
         return widgets.HTMLString(''.join(html))
-        # return widgets.HTMLString('<div {}>{}</div>'.format(
-        #     widgets.html_params(name=field.name, **kwargs)),
-        #     data
-        # )

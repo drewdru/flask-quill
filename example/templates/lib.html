@@ -1,0 +1,118 @@
+{% import 'static.html' as admin_static with context %}
+
+
+{# ---------------------- Forms -------------------------- #}
+{% macro render_field(form, field, kwargs={}, caller=None) %}
+    <div class="form-group">
+        <label for="{{ field.id }}" class="col-md-2 control-label">{{ field.label.text }}
+            
+        </label>
+
+        <div class="{{ kwargs.get('column_class', 'col-md-10') }}">
+            {% set _dummy = kwargs.setdefault('class', 'form-control') %}
+            {{ field(**kwargs)|safe }}
+            {% if field.description %}
+                <p class="help-block">{{ field.description|safe }}</p>
+            {% endif %}
+            {% if direct_error %}
+                <ul class="help-block input-errors">
+                    {% for e in field.errors if e is string %}
+                        <li>{{ e }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+        </div>
+        {% if caller %}
+            {{ caller(form, field, direct_error, kwargs) }}
+        {% endif %}
+    </div>
+{% endmacro %}
+
+{% macro render_header(form, text) %}
+    <h3>{{ text }}</h3>
+{% endmacro %}
+
+{% macro render_form_fields(form, form_opts=None) %}
+    {% if form.hidden_tag is defined %}
+        {{ form.hidden_tag() }}
+    {% else %}
+        {% if csrf_token %}
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+        {% endif %}
+        {% for f in form if f.widget.input_type == 'hidden' %}
+            {{ f }}
+        {% endfor %}
+    {% endif %}
+
+    {% if form_opts and form_opts.form_rules %}
+        {% for r in form_opts.form_rules %}
+            {{ r(form, form_opts=form_opts) }}
+        {% endfor %}
+    {% else %}
+        {% for f in form if f.widget.input_type != 'hidden' %}
+            {% if form_opts %}
+                {% set kwargs = form_opts.widget_args.get(f.name, {}) %}
+            {% else %}
+                {% set kwargs = {} %}
+            {% endif %}
+                {{ render_field(form, f, kwargs) }}
+        {% endfor %}
+    {% endif %}
+{% endmacro %}
+
+{% macro form_tag(form=None, action=None) %}
+    <form action="{{ action or '' }}" method="POST" role="form" class="admin-form form-horizontal"
+          enctype="multipart/form-data">
+        {{ caller() }}
+    </form>
+{% endmacro %}
+
+{% macro render_form_buttons(cancel_url, extra=None, is_modal=False, submit_button_text='Save', cancel_button_text='Cancel', safe_extra=False) %}
+    <hr>
+    <div class="form-group">
+        <div class="col-md-offset-2 col-md-10 submit-row">
+            <input type="submit" class="btn btn-primary" value="submit_button_text"/>
+            {{ ' ' }}
+            {% if extra %}
+                {% if safe_extra %}
+                    {{ extra|safe }}
+                {% else %}
+                    {{ extra}}
+                {% endif %}
+                {{ ' ' }}
+            {% endif %}
+            {% if cancel_url %}
+                <a href="{{ cancel_url }}" class="btn btn-danger" role="button"
+                   {% if is_modal %}data-dismiss="modal"{% endif %}>cancel_button_text</a>
+            {% endif %}
+        </div>
+    </div>
+{% endmacro %}
+
+{% macro render_form(
+    form,
+    cancel_url,
+    extra=None,
+    form_opts=None,
+    action=None,
+    is_modal=False,
+    submit_button_text='Save',
+    cancel_button_text='Cancel',
+    safe_extra=False
+) -%}
+    {% call form_tag(action=action) %}
+        {{ render_form_fields(form, form_opts=form_opts) }}
+        {{ render_form_buttons(cancel_url, extra, is_modal, submit_button_text, cancel_button_text, safe_extra) }}
+    {% endcall %}
+{% endmacro %}
+
+{% macro form_css() %}
+    <link href="//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css" rel="stylesheet">
+    {% if editable_columns %}
+    <!-- x-editable/css/bootstrap3-editable.css -->
+    {% endif %}
+{% endmacro %}
+
+{% macro form_js() %}
+    <script type="text/javascript" src="//code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
+{% endmacro %}

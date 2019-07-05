@@ -12,20 +12,14 @@ class QuillWTForms {
   *   Quill Handlers https://quilljs.com/docs/modules/toolbar/#toolbar-module
   * @param {Array} toolbarOptions
   *   Quill toolbar options https://quilljs.com/docs/modules/toolbar/#container
-  * @param {Boolean} isTab
   */
-  constructor(config, handlers=null, toolbarOptions=null, isTab=false) {
+  constructor(config, handlers=null, toolbarOptions=null) {
     const vm = this;
 
     vm.modelID = config.modelID;
     vm.uploadImageUrl = config.uploadImageUrl;
     vm.deleteImageUrl = config.deleteImageUrl;
     
-    vm.isTab = isTab;
-    if(vm.is_tab) {
-      vm.tabFieldName = config.tabFieldName;
-    }
-
     vm.toolbarOptions = toolbarOptions;
     if (vm.toolbarOptions === null) {
       vm.toolbarOptions = [
@@ -60,7 +54,6 @@ class QuillWTForms {
         const table = item.closest('table');
         const table_data = table.getAttribute("id").split('__');
         const tab_id = table_data[0].replace('-language', '');
-        // console.log(`#hidden-${tab_id}-${CONTENT_FIELD}`);      
   
         const editor = new Quill(item, {
             modules: {
@@ -76,22 +69,21 @@ class QuillWTForms {
             }
         });
         
-        console.log('item:', $(item));
-        console.log('item:', item);
         // TODO: get content element 
-        const contentId = `#hidden-${item.getAttribute('id')}`;
-        console.log('contentId:', contentId);
+        const contentId = `#hidden-${item.getAttribute('id')}`; // TODO: CHANGE FOR TABS
         const content = $(contentId).val();
-        console.log('content:', content);
+
+        let is_innerHTML = true;
         const qlEditorElem = $(item).find('.ql-editor');
         qlEditorElem[0].innerHTML = content
+        setTimeout(function(){ is_innerHTML = false; }, 1000);
         
         editor.on('text-change', (delta, oldContents, source) => {
+            if (is_innerHTML) return;
             if (source !== 'user') return;
   
             const inserted = vm.getImgUrls(delta);
             const deleted = vm.getImgUrls(editor.getContents().diff(oldContents));
-            // if (inserted.length) { 
             for (let i = 0; i < inserted.length; i++) {
                 // Save Image from clipboard
                 try {
@@ -124,20 +116,14 @@ class QuillWTForms {
             for (let i = 0; i < deleted.length; i++) {
               vm.deleteFromServer(deleted[i]);
             }
-            console.log(editor.getContents())
             $(contentId).attr("value", item.children[0].innerHTML);
         });
-
-        
 
         /**
         * Step1. select local image
         *
         */
         function selectLocalImage(event, args) {
-          console.log('AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA');
-          console.log('event:', event);
-          console.log('args:', args);
           const input = document.createElement('input');
           input.setAttribute('type', 'file');
           input.click();
@@ -233,7 +219,6 @@ class QuillWTForms {
           xhr.send(fd);
         }
 
-
         if (handlers) {
           vm.handlers = handlers;
           if (vm.handlers.image === undefined) {
@@ -242,8 +227,6 @@ class QuillWTForms {
         } else {
           editor.getModule("toolbar").addHandler("image", selectLocalImage);
         }
-
-
       });
     }
 

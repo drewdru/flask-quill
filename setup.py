@@ -14,6 +14,7 @@ setuptools.setup(
     # templates=['flask_quill/templates/dependencies.html'],
     package_data={'flask_quill': [
         'static/editor/editor.js',
+        'static/editor/view-quill.css',
         'static/tabs/tabs.css',
         'static/tabs/tabs.js',
         'templates/dependencies.html',

@@ -1,0 +1,44 @@
+{% extends 'master.html' %}
+{% import 'lib.html' as lib with context %}
+
+{% macro extra() %}
+    <input name="_add_another" type="submit" class="btn btn-default" value="Save and Add Another"/>
+    <input name="_continue_editing" type="submit" class="btn btn-default"
+           value="Save and Continue Editing"/>
+{% endmacro %}
+
+{% block head %}
+    {{ super() }}
+    {{ lib.form_css() }}
+{% endblock %}
+
+{% block content %}
+    <section class="panel general">
+        <div class="panel-body tab-content tab-pane">
+            {% block panel_body %}
+                {% block pre_form %}{% endblock %}
+                {% block form_render %}
+                    {{ lib.render_form(form, return_url, extra(), form_opts) }}
+                {% endblock %}
+            {% endblock %}
+        </div>
+    </section>
+{% endblock %}
+
+{% block tail %}
+    {{ super() }}
+    {{ lib.form_js() }}
+
+    {{flask_quill_dependencies|safe}}
+
+    <script>
+        $( document ).ready(function() {
+            const quillWtf = new QuillWTForms({
+                modelID: 1,
+                uploadImageUrl: "/uploaded_editor_files/",
+                deleteImageUrl: "/delete_file_by_url/",
+                tabFieldName: "/language/",
+            });
+        });
+    </script>
+{% endblock %}

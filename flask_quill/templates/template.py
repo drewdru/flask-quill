@@ -16,17 +16,19 @@ def getDependecies():
         data = f.read()
 
     tabsCSS = ''
+    viewQuillCSS = ''
     tabsJS = ''
     editorJS = ''
     with open('{}tabs/tabs.css'.format(staticDir),'r') as f:
         tabsCSS = f.read()
+    with open('{}editor/view-quill.css'.format(staticDir),'r') as f:
+        viewQuillCSS = f.read()
     with open('{}tabs/tabs.js'.format(staticDir),'r') as f:
         tabsJS = f.read()
     with open('{}editor/editor.js'.format(staticDir),'r') as f:
         editorJS = f.read()
 
     tm = Template(data)
-    msg = tm.render(tabsCSS=tabsCSS, tabsJS=tabsJS, editorJS=editorJS)
+    msg = tm.render(tabsCSS=tabsCSS, tabsJS=tabsJS, editorJS=editorJS, viewQuillCSS=viewQuillCSS)
 
-    print(msg)
     return msg
